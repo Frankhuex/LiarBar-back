@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: LiarBar-back
+  cache:
+    type: none

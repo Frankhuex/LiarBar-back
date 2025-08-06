@@ -35,6 +35,9 @@ public class Room {
     public boolean removePlayer(String userId) {
         Player player = getPlayer(userId);
         if (player != null) {
+            if (player.isHost() && playerList.size() > 1) {
+                playerList.get(1).setHost(true);
+            }
             playerList.remove(player);
             return true;
         }

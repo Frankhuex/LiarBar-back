@@ -1,5 +1,6 @@
 package org.huex.liarbarback;
 
+import org.huex.liarbarback.events.RoomUpdatedEvent;
 import org.huex.liarbarback.managers.PlayerManager;
 import org.huex.liarbarback.managers.RoomManager;
 import org.huex.liarbarback.managers.SessionManager;
@@ -7,6 +8,7 @@ import org.huex.liarbarback.models.Message;
 import org.huex.liarbarback.models.Player;
 import org.huex.liarbarback.models.Room;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 import jakarta.websocket.Session;
@@ -39,6 +41,13 @@ public class MsgHandler {
             }
         }
         return false;
+    }
+
+    @EventListener
+    public void roomUpdatedListener(RoomUpdatedEvent event) {
+        Room room = roomManager.getRoom(event.getRoomId()).orElse(null);
+        if (room==null) return;
+        broadcastRoom(room);
     }
 
     public void broadcastRoom(Room room) {

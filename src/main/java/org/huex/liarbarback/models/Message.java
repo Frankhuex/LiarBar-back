@@ -1,10 +1,14 @@
 package org.huex.liarbarback.models;
 
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import lombok.*;
 
 @Getter @Setter @AllArgsConstructor @NoArgsConstructor
 public class Message<T> {
+
+    @JsonFormat(shape = JsonFormat.Shape.NUMBER)
     public enum MsgType {
         // Request
         CREATE_ROOM, 

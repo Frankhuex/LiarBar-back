@@ -1,18 +1,24 @@
 package org.huex.liarbarback;
 
 
+import java.io.IOException;
+
 import org.huex.liarbarback.managers.SessionManager;
 import org.huex.liarbarback.models.Message;
+import org.huex.liarbarback.models.MessageEncoder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import org.springframework.web.socket.CloseStatus;
+import org.springframework.web.socket.WebSocketSession;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import jakarta.websocket.OnClose;
+import jakarta.websocket.OnError;
 import jakarta.websocket.OnMessage;
 import jakarta.websocket.OnOpen;
 import jakarta.websocket.Session;
@@ -21,7 +27,8 @@ import jakarta.websocket.server.ServerEndpoint;
 
 @ServerEndpoint(
     value = "/api/ws/{user_id}",
-    configurator = SpringEndpointConfigurator.class // 使用自定义配置器
+    configurator = SpringEndpointConfigurator.class, // 使用自定义配置器
+    encoders = {MessageEncoder.class}
 )
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE) // 设置为原型作用域
@@ -71,5 +78,15 @@ public class WebSocketServer {
             session.getAsyncRemote().sendText("Error parsing message: " + e.getMessage());
         }
         
+    }
+
+    @OnError
+    public void onError(Session session, Throwable error) {
+        System.err.println("WebSocket error: " + error.getMessage());
+        try {
+            sessionManager.removeSession(userId);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

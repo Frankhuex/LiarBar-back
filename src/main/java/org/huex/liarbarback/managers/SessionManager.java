@@ -49,6 +49,9 @@ public class SessionManager {
             } else {
                 // 如果房间已经开始，玩家对象不删除，标记为不活跃
                 player.setActive(false);
+                if (room.getPlayer(userId)==room.getPlayerList().get(room.getCurrentPlayerIndex())) {
+                    room.skip(userId);
+                }
             }
         } else {
             // 如果房间不存在，直接删除玩家

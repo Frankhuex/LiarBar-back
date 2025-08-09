@@ -11,14 +11,18 @@ public class Message<T> {
     @JsonFormat(shape = JsonFormat.Shape.NUMBER)
     public enum MsgType {
         // Request
-        CREATE_ROOM, 
-        JOIN_ROOM, 
-        LEAVE_ROOM, 
-        CHANGE_NAME, 
-        GET_ROOM_PLAYERS, 
-        PREPARE, 
-        CANCEL_PREPARE,
-        START_GAME,
+        CREATE_ROOM, // null
+        JOIN_ROOM, // String roomId
+        LEAVE_ROOM, // null
+        CHANGE_NAME, // String newName
+        GET_ROOM_PLAYERS, // null
+        PREPARE, // boolean isReady
+        CANCEL_PREPARE, 
+        START_GAME, // boolean
+        PLAY_CARDS, // String cardId
+        SKIP,
+        CHALLENGE,
+        RESTART,
 
         // Response
         WELCOME,

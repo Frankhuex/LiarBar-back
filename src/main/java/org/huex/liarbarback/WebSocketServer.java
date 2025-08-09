@@ -6,6 +6,8 @@ import java.io.IOException;
 import org.huex.liarbarback.managers.SessionManager;
 import org.huex.liarbarback.models.Message;
 import org.huex.liarbarback.models.MessageEncoder;
+import org.huex.liarbarback.models.PlayCards;
+import org.huex.liarbarback.models.PlayCardsEncoder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
@@ -14,6 +16,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.WebSocketSession;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
@@ -28,7 +31,7 @@ import jakarta.websocket.server.ServerEndpoint;
 @ServerEndpoint(
     value = "/api/ws/{user_id}",
     configurator = SpringEndpointConfigurator.class, // 使用自定义配置器
-    encoders = {MessageEncoder.class}
+    encoders = {MessageEncoder.class, PlayCardsEncoder.class} // 注册编码器
 )
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE) // 设置为原型作用域
@@ -71,7 +74,17 @@ public class WebSocketServer {
         mapper.registerModule(new JavaTimeModule());
         try {
             Message<?> receivedMessage = mapper.readValue(message, Message.class);
-            boolean success=msgHandler.handleMsg(receivedMessage, session, userId);
+            boolean success=false;
+            if (receivedMessage.getMsgType().equals(Message.MsgType.PLAY_CARDS)) {
+                System.out.println("Received PLAY_CARDS message: " + receivedMessage.getData());
+                TypeReference<Message<PlayCards>> typeRef = new TypeReference<>() {};
+                Message<PlayCards> receivedMessagePlayCards = mapper.readValue(message, typeRef);
+                success=msgHandler.handleMsg(receivedMessagePlayCards, session, userId);
+            }
+            else {
+                System.out.println("Received normal message: " + receivedMessage.getMsgType());
+                success=msgHandler.handleMsg(receivedMessage, session, userId);
+            }
             System.out.println("Message handled: " + receivedMessage + (success?" success":" failed"));
         } catch (Exception e) {
             System.err.println("Error parsing message: " + e.getMessage());

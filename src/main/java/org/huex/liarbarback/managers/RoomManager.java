@@ -53,4 +53,15 @@ public class RoomManager {
         } while (rooms.containsKey(roomId.toString()));
         return roomId.toString();
     }
+
+    public boolean removeRoom(String roomId) {
+        if (rooms.containsKey(roomId)) {
+            rooms.remove(roomId);
+            System.out.println("Room with ID: " + roomId + " has been removed.");
+            return true;
+        } else {
+            System.out.println("Room with ID: " + roomId + " does not exist.");
+            return false;
+        }
+    }
 }

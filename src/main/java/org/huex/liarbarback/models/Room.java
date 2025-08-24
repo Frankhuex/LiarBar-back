@@ -41,7 +41,7 @@ public class Room {
         cardDeck = null;
         currentPlayerIndex = -1;
         roundBeginnerIndex = -1;
-        currentClaimRank = null;
+        currentClaimRank = Rank.NULL;
 
         winner = null;
     }
@@ -92,8 +92,9 @@ public class Room {
         // Deal cards to players
         cardDeck = new CopyOnWriteArrayList<>();
         for (Suit suit : Suit.values()) {
+            if (suit==Suit.UNKNOWN) continue; // Skip UNKNOWN suit
             for (Rank rank : Rank.values()) {
-                if (rank==Rank.BLANK) continue;
+                if (rank==Rank.NULL) continue;
                 cardDeck.add(new Card(suit, rank));
             }
         }
@@ -117,6 +118,8 @@ public class Room {
 
         currentPlayerIndex = 0;
         roundBeginnerIndex = 0;
+
+        System.out.println("Game started: "+this);
         return true;
     }
 
@@ -126,7 +129,7 @@ public class Room {
         cardDeck = null;
         currentPlayerIndex = 0;
         roundBeginnerIndex = 0;
-        currentClaimRank = null;
+        currentClaimRank = Rank.NULL;
 
         for (Player player : playerList) {
             if (!player.isActive()) {
@@ -149,11 +152,11 @@ public class Room {
             System.out.println("It's not " + userId + "'s turn.");
             return false;
         }
-        if (currentClaimRank!=null && !playCards.getClaimRank().equals(currentClaimRank)) {
+        if (currentClaimRank!=Rank.NULL && !playCards.getClaimRank().equals(currentClaimRank)) {
             System.out.println("Invalid claim rank. Current: " + currentClaimRank + ", get: " + playCards.getClaimRank());
             return false;
         }
-        if (currentClaimRank==null) {
+        if (currentClaimRank==Rank.NULL) {
             currentClaimRank = playCards.getClaimRank();
             roundBeginnerIndex = currentPlayerIndex;
         }
@@ -185,12 +188,12 @@ public class Room {
             System.out.println("It's not " + userId + "'s turn.");
             return false;
         }
-        if (currentClaimRank == null) {
+        if (currentClaimRank == Rank.NULL) {
             System.out.println("You are beginner. Cannot skip.");
             return false;
         }
         if (currentPlayerIndex == roundBeginnerIndex) {
-            currentClaimRank = null; // New round
+            currentClaimRank = Rank.NULL; // New round
             System.out.println("New round begins.");
             for (Player player : playerList) {
                 Card.moveAllCards(player.getPlayedCards(), cardDeck);
@@ -210,7 +213,7 @@ public class Room {
             System.out.println("It's not " + userId + "'s turn.");
             return false;
         }
-        if (currentClaimRank == null) {
+        if (currentClaimRank == Rank.NULL) {
             System.out.println("You are beginner. No claim to challenge.");
             return false;
         }
@@ -223,7 +226,7 @@ public class Room {
                     Card.moveAllCards(player.getPlayedCards(),lastPlayer.getHandCards());
                 }
                 roundBeginnerIndex = currentPlayerIndex;
-                currentClaimRank = null;
+                currentClaimRank = Rank.NULL;
                 return true;
             }
         }
@@ -233,7 +236,7 @@ public class Room {
         }
         currentPlayerIndex = (currentPlayerIndex-1+playerList.size())%playerList.size();
         roundBeginnerIndex = currentPlayerIndex;
-        currentClaimRank = null;
+        currentClaimRank = Rank.NULL;
 
         if (!playerList.get(currentPlayerIndex).isActive()) {
             skip(playerList.get(currentPlayerIndex).getUserId());
@@ -257,7 +260,7 @@ public class Room {
     @Override
     public String toString() {
         String str = "Room " +id + "\n"
-            + "ID\tName\tStatus\tReady\tHost\n"
+            + "ID\tName       \tActive\tReady\tHost\tHandcards\tPlayedcards\n"
             + "--------------------------------------------\n";
         for (Player player : playerList) {
             str += player.toString();

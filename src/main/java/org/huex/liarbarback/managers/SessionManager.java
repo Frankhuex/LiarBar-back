@@ -45,21 +45,27 @@ public class SessionManager {
         if (room!=null) {
             if (!room.isStarted()) {
                 playerManager.removePlayer(userId);
+                System.out.println("Player removed: " + userId);
                 room.removePlayer(userId);
+                System.out.println("Player removed from room: " + userId);
+                
             } else {
                 // 如果房间已经开始，玩家对象不删除，标记为不活跃
                 player.setActive(false);
+                System.out.println("Player marked as inactive: " + userId);
                 if (room.getPlayer(userId)==room.getPlayerList().get(room.getCurrentPlayerIndex())) {
                     room.skip(userId);
+                    System.out.println("Player skipped: " + userId);
                 }
             }
         } else {
             // 如果房间不存在，直接删除玩家
             playerManager.removePlayer(userId);
+            System.out.println("Room not found, player removed: " + userId);
         }
         eventPublisher.publishEvent(new RoomUpdatedEvent(this, player.getRoomId()));
         sessions.remove(userId);
-        System.out.println("User " + userId + " disconnected. Total connections: " + sessions.size());
+        System.out.println("Session for user " + userId + " disconnected. Total connections: " + sessions.size());
         return true;
     }
     

@@ -32,7 +32,9 @@ public class Player {
             +name+"\t"
             +(isActive?"Active":"Inactive")+"\t"
             +(isReady?"Ready":"NotReady")+"\t"
-            +(isHost?"Host":"NotHost")+"\n";
+            +(isHost?"Host":"NotHost")+"\t"
+            +handCards.size()+"\t"
+            +playedCards.size()+"\n";
     }
 
     public boolean hasCard(Card card) {

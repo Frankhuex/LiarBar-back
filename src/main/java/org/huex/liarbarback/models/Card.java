@@ -11,12 +11,12 @@ import lombok.*;
 public class Card {
     @JsonFormat(shape = JsonFormat.Shape.NUMBER)
     public enum Suit {
-        HEARTS, DIAMONDS, CLUBS, SPADES
+        HEARTS, DIAMONDS, CLUBS, SPADES, UNKNOWN
         // 红桃，方块，梅花，黑桃
     }
     @JsonFormat(shape = JsonFormat.Shape.NUMBER)
     public enum Rank {
-        BLANK, ACE, TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE, TEN, JACK, QUEEN, KING
+        NULL, ACE, TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE, TEN, JACK, QUEEN, KING
     }
     private Suit suit;
     private Rank rank;

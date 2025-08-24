@@ -90,11 +90,12 @@ public class MsgHandler {
                     p.setActive(false);
                     continue;
                 }
-                session.getAsyncRemote()
-                    .sendObject(new Message<>(Message.MsgType.ROOM_PLAYERS_LIST, room));
-
+                Message<Room> message = new Message<>(Message.MsgType.ROOM_PLAYERS_LIST, room);
+                session.getAsyncRemote().sendObject(message);
+                System.out.println("Message ID: "+message.getMsgId());
             }
         }
+        System.out.println("Room broadcast");
     }
 
 
@@ -184,8 +185,9 @@ public class MsgHandler {
         session.getAsyncRemote().sendObject(new Message<>(Message.MsgType.ROOM_LEFT, "Left room"));
         if (room.getPlayerList().isEmpty()) {
             eventPublisher.publishEvent(new RoomUpdatedEvent(this, player.getRoomId()));
+        } else {
+            broadcastRoom(room);
         }
-        broadcastRoom(room);
         return true;
     }
 
@@ -255,9 +257,12 @@ public class MsgHandler {
             return false;
         }
         if (!room.isStarted() && room.getPlayerList().stream().allMatch(Player::isReady)) {
-            room.startGame();
-            broadcastRoom(room);
-            return true;
+            if (room.startGame()) {
+                broadcastRoom(room);
+                System.out.println("Game started: "+room);
+                return true;
+            }
+            return false;
         } else {
             session.getAsyncRemote().sendObject(new Message<>(Message.MsgType.ERROR, "Game cannot be started"));
             return false;

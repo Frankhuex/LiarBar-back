@@ -60,6 +60,7 @@ public class Room {
             return false;
         }
         playerList.add(player);
+        System.out.println("Player " + player.getName() + " joined room "+id);
         return true;
     }
 
@@ -70,9 +71,9 @@ public class Room {
                 playerList.get(1).setHost(true);
             }
             playerList.remove(player);
+            System.out.println("Player " + userId + " removed from room "+ id);
             return true;
         }
-        
         return false;
     }
 
@@ -138,6 +139,7 @@ public class Room {
             }
             player.restart();
         }
+        System.out.println("Game restarted: "+this);
 
     }
 
@@ -167,13 +169,8 @@ public class Room {
             return false;
         }
         System.out.println("Player " + userId + " played cards: " + playCards.cards);
-        if (player.getHandCards().isEmpty()) {
-            isEnded = true;
-            winner = player;
-            System.out.println("Player " + userId + " wins the game!");
-        } else {
-            System.out.println("Player " + userId + " has " + player.getHandCards().size() + " cards left.");
-        }
+        System.out.println("Player " + userId + " has " + player.getHandCards().size() + " cards left.");
+        
         currentPlayerIndex = (currentPlayerIndex + 1) % playerList.size();
 
         if (!playerList.get(currentPlayerIndex).isActive()) {
@@ -193,6 +190,13 @@ public class Room {
             return false;
         }
         if (currentPlayerIndex == roundBeginnerIndex) {
+            Player currentPlayer = playerList.get(currentPlayerIndex);
+            if (currentPlayer.getHandCards().isEmpty()) {
+                isEnded = true;
+                winner = currentPlayer;
+                System.out.println("Player " + currentPlayer.getName() + " wins the game!");
+                return true;
+            }
             currentClaimRank = Rank.NULL; // New round
             System.out.println("New round begins.");
             for (Player player : playerList) {
@@ -200,11 +204,11 @@ public class Room {
             }
         } else {
             currentPlayerIndex = (currentPlayerIndex + 1) % playerList.size();
+            if (!playerList.get(currentPlayerIndex).isActive()) {
+                skip(playerList.get(currentPlayerIndex).getUserId());
+            }
         }
-
-        if (!playerList.get(currentPlayerIndex).isActive()) {
-            skip(playerList.get(currentPlayerIndex).getUserId());
-        }
+        System.out.println("Player " + userId + " skipped.");
         return true;
     }
 
@@ -222,6 +226,7 @@ public class Room {
         for (Card card: lastPlayer.getPlayedCards()) {
             if (!card.getRank().equals(currentClaimRank)) {
                 System.out.println("Challenge success! " + lastPlayer.getName() + " lied.");
+                System.out.println("Played: "+card.getRank()+", Claimed: "+currentClaimRank);
                 for (Player player : playerList) {
                     Card.moveAllCards(player.getPlayedCards(),lastPlayer.getHandCards());
                 }
@@ -259,13 +264,25 @@ public class Room {
 
     @Override
     public String toString() {
-        String str = "Room " +id + "\n"
-            + "ID\tName       \tActive\tReady\tHost\tHandcards\tPlayedcards\n"
-            + "--------------------------------------------\n";
+        String str = 
+            "--------------------------------------------------------------------\n"
+            + "Room " +id + "\n"
+            + "--------------------------------------------------------------------\n"
+            + "ID\tName       \tActive\tReady\tHost\tHand\tPlayed\n"
+            + "--------------------------------------------------------------------\n";
         for (Player player : playerList) {
             str += player.toString();
         }
-        str+="--------------------------------------------\n";
+        str+="---------------------------------------------------------------------\n"
+        + "Max players: " + maxPlayers + "\n"
+        + "Started: " + isStarted + "\n"
+        + "Ended: " + isEnded + "\n"
+        + "Card deck: " + (cardDeck==null? "null" : cardDeck.size()) + "\n"
+        + "Current player: " + currentPlayerIndex + "\n"
+        + "Round beginner: " + roundBeginnerIndex + "\n"
+        + "Current claim rank: " + currentClaimRank + "\n"
+        + "Winner: " + (winner==null? "null" : winner.getName()) + "\n"
+        + "---------------------------------------------------------------------\n";
         return str;
     }
 

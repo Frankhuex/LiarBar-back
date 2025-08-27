@@ -64,6 +64,7 @@ public class MsgHandler {
             }
         } catch (Exception e) {
             System.err.println("Error handling message: " + e.getMessage());
+            System.err.println(e.getStackTrace());
             session.getAsyncRemote().sendObject(new Message<>(MsgType.ERROR, "Failed to handle message: "+e.getMessage()));
             return false;
         }
@@ -82,6 +83,7 @@ public class MsgHandler {
     }
 
     public void broadcastRoom(Room room) {
+        System.out.println("Start broadcasting room");
         System.out.println(room);
         for (Player p : room.getPlayerList()) {
             if (p.isActive()) {
@@ -92,10 +94,10 @@ public class MsgHandler {
                 }
                 Message<Room> message = new Message<>(Message.MsgType.ROOM_PLAYERS_LIST, room);
                 session.getAsyncRemote().sendObject(message);
-                System.out.println("Message ID: "+message.getMsgId());
+                System.out.println("Sent msg to player "+p.getName()+" MsgID:"+message.getMsgId());
             }
         }
-        System.out.println("Room broadcast");
+        System.out.println("End broadcasting room");
     }
 
 
@@ -120,6 +122,7 @@ public class MsgHandler {
         }
         try {
             Room room = roomManager.createRoom(userId);
+            System.out.println("Room " + room.getId() + " created by user: " + userId);
             broadcastRoom(room);
             return true;
         } catch (Exception e) {
@@ -188,6 +191,7 @@ public class MsgHandler {
         } else {
             broadcastRoom(room);
         }
+        System.out.println("Player " + userId + " left room "+room.getId());
         return true;
     }
 
@@ -205,6 +209,7 @@ public class MsgHandler {
             return false;
         }
         player.setName(name);
+        System.out.println("Player " + userId + " changed name to " + name);
         broadcastRoom(room);
         return true;
     }
@@ -234,6 +239,7 @@ public class MsgHandler {
             session.getAsyncRemote().sendObject(new Message<>(Message.MsgType.PLAYER_NOT_FOUND, "Player not found in room"));
             return false;
         }
+        System.out.println("Player " + userId + (isReady?" ready":" not ready"));
         broadcastRoom(room);
         return true;
     }

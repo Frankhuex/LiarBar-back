@@ -288,11 +288,11 @@ public class MsgHandler {
             session.getAsyncRemote().sendObject(new Message<>(Message.MsgType.PLAYER_NOT_FOUND, "Player not found in room"));
             return false;
         }
-        if (!player.isHost()) {
-            System.err.println("Player " + userId + " is not the host");
-            session.getAsyncRemote().sendObject(new Message<>(Message.MsgType.ERROR, "You are not the host"));
-            return false;
-        }
+        // if (!player.isHost()) {
+        //     System.err.println("Player " + userId + " is not the host");
+        //     session.getAsyncRemote().sendObject(new Message<>(Message.MsgType.ERROR, "You are not the host"));
+        //     return false;
+        // }
         room.restartGame();
         broadcastRoom(room);
         return true;

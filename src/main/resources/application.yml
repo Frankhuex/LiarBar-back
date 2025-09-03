@@ -3,3 +3,5 @@ spring:
     name: LiarBar-back
   cache:
     type: none
+server:
+  port: 5500

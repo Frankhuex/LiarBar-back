@@ -146,7 +146,7 @@ public class Room {
 
 
     private boolean isTurn(String userId) {
-        return playerList.get(currentPlayerIndex).getUserId().equals(userId);
+        return playerList.get(currentPlayerIndex).getUserId().equals(userId) && !isEnded;
     }
 
     public boolean playCards(PlayCards playCards, String userId) {
@@ -174,7 +174,7 @@ public class Room {
         currentPlayerIndex = (currentPlayerIndex + 1) % playerList.size();
 
         if (!playerList.get(currentPlayerIndex).isActive()) {
-            skip(playerList.get(currentPlayerIndex).getUserId());
+            autoPlay(playerList.get(currentPlayerIndex).getUserId());
         }
 
         return true;
@@ -204,11 +204,11 @@ public class Room {
             }
         } else {
             currentPlayerIndex = (currentPlayerIndex + 1) % playerList.size();
-            if (!playerList.get(currentPlayerIndex).isActive()) {
-                skip(playerList.get(currentPlayerIndex).getUserId());
-            }
         }
         System.out.println("Player " + userId + " skipped.");
+        if (!playerList.get(currentPlayerIndex).isActive()) {
+            autoPlay(playerList.get(currentPlayerIndex).getUserId());
+        }
         return true;
     }
 
@@ -244,9 +244,54 @@ public class Room {
         currentClaimRank = Rank.NULL;
 
         if (!playerList.get(currentPlayerIndex).isActive()) {
-            skip(playerList.get(currentPlayerIndex).getUserId());
+            autoPlay(playerList.get(currentPlayerIndex).getUserId());
         }
         return true;
+    }
+
+
+    public boolean autoPlay(String userId) {
+        if (!isTurn(userId)) {
+            System.out.println("It's not " + userId + "'s turn.");
+            return false;
+        }
+        if (canChallengeOrSkip()) {
+            return skip(userId);
+        }
+        Player currentPlayer = playerList.get(currentPlayerIndex);
+        
+        
+        List<Card> cards=new ArrayList<>();
+        Card card=currentPlayer.getHandCards().get(0);
+        cards.add(card);
+        if (isNewRoundBeginner()) {
+            PlayCards playCards = new PlayCards(cards, card.getRank());
+            return playCards(playCards, userId);
+        } else {
+            List<Card> findCards=currentPlayer.getHandCards().stream()
+                .filter(c -> c.getRank().equals(currentClaimRank)).toList();
+            if (!cards.isEmpty()) {
+                PlayCards playCards = new PlayCards(findCards, currentClaimRank);
+                return playCards(playCards, userId);
+            } else {
+                PlayCards playCards = new PlayCards(cards, currentClaimRank);
+                return playCards(playCards, userId);
+            }
+        }
+    }
+
+
+
+    public boolean isRoundBeginner() {
+        return currentPlayerIndex == roundBeginnerIndex;
+    }
+
+    public boolean canChallengeOrSkip() {
+        return currentClaimRank!= Card.Rank.NULL;
+    }
+
+    public boolean isNewRoundBeginner() {
+        return isRoundBeginner() && !canChallengeOrSkip();
     }
 
 

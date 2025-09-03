@@ -53,9 +53,9 @@ public class SessionManager {
                 // 如果房间已经开始，玩家对象不删除，标记为不活跃
                 player.setActive(false);
                 System.out.println("Player marked as inactive: " + userId);
-                if (room.getPlayer(userId)==room.getPlayerList().get(room.getCurrentPlayerIndex())) {
-                    room.skip(userId);
-                    System.out.println("Player skipped: " + userId);
+                if (userId.equals(room.getPlayerList().get(room.getCurrentPlayerIndex()).getUserId())) {
+                    room.autoPlay(userId);
+                    System.out.println("Player autoplayed: " + userId);
                 }
             }
         } else {

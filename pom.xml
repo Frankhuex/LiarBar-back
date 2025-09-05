@@ -10,7 +10,7 @@
     </parent>
     <groupId>org.huex</groupId>
     <artifactId>LiarBar-back</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.2</version>
     <name>LiarBar-back</name>
     <description>LiarBar-back</description>
     <url/>

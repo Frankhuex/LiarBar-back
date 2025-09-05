@@ -171,6 +171,7 @@ public class Room {
         System.out.println("Player " + userId + " played cards: " + playCards.cards);
         System.out.println("Player " + userId + " has " + player.getHandCards().size() + " cards left.");
         
+        roundBeginnerIndex = currentPlayerIndex;
         currentPlayerIndex = (currentPlayerIndex + 1) % playerList.size();
 
         if (!playerList.get(currentPlayerIndex).isActive()) {
